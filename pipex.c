@@ -18,7 +18,7 @@ int	check_output_file(char *argv)
 		}
 		else if(errno == EACCES)
 		{
-			perror("Error\n");
+			permission_denied(argv);
 			return(-1);
 		}
 	}
@@ -32,8 +32,11 @@ int	check_input_file(char *argv)
 
 	if(access(argv, R_OK) == -1)
 	{
-		perror("Error\n");
-		exit(EXIT_FAILURE);
+		if(errno == ENOENT)
+			no_such_file_infile(argv);
+		else if(errno == EACCES)
+			permission_denied(argv);
+		return(-1);
 	}
 	else
 		fd = open(argv, O_RDONLY);
@@ -47,24 +50,17 @@ int main(int argc, char **argv)
 	int i;
 
 	if (argc < 5)
-		invalid_argument();
+		return(0);
 	fd[0] = check_input_file(argv[1]);
 	fd[1] = check_output_file(argv[argc - 1]);
-	if(fd[0] == -1 || fd[1] == -1)
+	if(fd[1] == -1 || fd[0] == -1)
 		fd_open_fail(fd);
+	check_command_arguments(argv, fd, argc);
 	if(pipe(pipefd) == -1)
-		pipe_failed(fd);
+		pipe_failed(NULL, fd);
 	first_child(argv[2], pipefd, fd);
 	i = loop_mid(argv, pipefd, fd, argc);
-/*	if(even(i))
-		last_child(argv[argc - 2], pipe2, pipefd, fd);
-	else
-		last_child(argv[argc - 2], pipefd, pipe2, fd);*/
-	//close_fd_pipe(pipefd, fd);
-	while(i >= 2)
-	{
+	while(i-- >= 2)
 		wait(NULL);
-		i--;
-	}
     return 0;
 }

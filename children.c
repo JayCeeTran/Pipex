@@ -29,19 +29,10 @@ void	first_child(char *argv, int *pipefd, int *fd)
 		dup2(fd[0], 0);
 		dup2(pipefd[1], 1);
 		close_pipefd(pipefd);
-		execve(path, cmd, NULL);
-		perror("Error\n");
-		exit(EXIT_FAILURE);
+		execute_command(cmd, path, fd);
 	}
 	free_split(cmd);
 	free(path);
-}
-
-int	even(int n)
-{
-	if(n % 2 == 0)
-		return(1);
-	return(0);
 }
 
 int	loop_mid(char **argv, int *pipe1, int *fd, int ac)
@@ -63,11 +54,8 @@ int	loop_mid(char **argv, int *pipe1, int *fd, int ac)
 			newpipe = pipe1;
 		}
 		if(pipe(newpipe) == -1)
-		{
-			perror("pipe erro\n");
-			exit(EXIT_FAILURE);
-		}	
-		mid_child(argv[i], cur_pipe, newpipe);
+			pipe_failed(cur_pipe, fd);	
+		mid_child(argv[i], cur_pipe, newpipe, fd);
 		i++;
 		close_pipefd(cur_pipe);
 	}
@@ -78,29 +66,27 @@ int	loop_mid(char **argv, int *pipe1, int *fd, int ac)
     return(i);
 }
 
-void	mid_child(char *argv, int *pipe1, int *pipe2)
+void	mid_child(char *argv, int *pipe1, int *pipe2, int *fd)
 {
 	int pid;
 	char **cmd;
 	char *path;
 
 	cmd = ft_split(argv, ' ');
+	if(!cmd)
+		failed_malloc(pipe1, pipe2);
 	path = ft_strjoin("/bin/", cmd[0]);
+	if(!path)
+		path_failed_malloc(cmd, pipe1, pipe2);
 	pid = fork();
 	if(pid == -1)
-	{
-		perror("Error\n");
-		exit(EXIT_FAILURE);
-	}
+		fork_error(cmd, path, pipe1, pipe2);
 	if(pid == 0)
 	{
 		dup2(pipe1[0], 0);
 		dup2(pipe2[1], 1);
-		close_pipefd(pipe1);
-		close_pipefd(pipe2);
-		execve(path, cmd, NULL);
-		perror("Error\n");
-		exit(EXIT_FAILURE);
+		close_fd_pipe(pipe1, pipe2);
+		execute_command(cmd, path, fd);
 	}
 	free_split(cmd);
 	free(path);
@@ -126,11 +112,9 @@ void	last_child(char *argv, int *pipefd, int *fd)
 		dup2(pipefd[0], 0);
 		dup2(fd[1], 1);
 		close_pipefd(pipefd);
-		execve(path, cmd, NULL);
-		perror("Error\n");
-		exit(EXIT_FAILURE);
+		execute_command(cmd, path, fd);
 	}
-	close_pipefd(pipefd);
+	close_fd_pipe(pipefd, fd);
 	free_split(cmd);
 	free(path);
 }

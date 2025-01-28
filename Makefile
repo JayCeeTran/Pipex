@@ -5,6 +5,8 @@ SRCS = pipex.c \
 	error_msgs2.c \
 	children.c \
 	free_cmds.c \
+	write_error.c \
+	execute_command.c \
 
 OBJ = $(SRCS:.c=.o)
 LIBFT = -Llibft -lft

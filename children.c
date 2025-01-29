@@ -9,27 +9,28 @@ void	fork_error(char **cmd, char *path, int *pipefd, int *fd)
 	exit(EXIT_FAILURE);
 }
 
-void	first_child(char *argv, int *pipefd, int *fd)
+void	first_child(char *argv, int *pipefd, int *fd, char **path)
 {
 	int pid;
 	char **cmd;
-	char *path;
+	char *path_exe;
 
+	//find_correct_bin(argv, path);
 	cmd = ft_split(argv, ' ');
 	if(!cmd)
 		failed_malloc(pipefd, fd);
-	path = ft_strjoin("/bin/", cmd[0]);
-	if(!path)
+	path_exe = ft_strjoin("/bin/", cmd[0]);
+	if(!path_exe)
 		path_failed_malloc(cmd, pipefd, fd);
 	pid = fork();
 	if(pid == -1)
-		fork_error(cmd, path, pipefd, fd);
+		fork_error(cmd, path_exe, pipefd, fd);
 	if (pid == 0)
 	{
 		dup2(fd[0], 0);
 		dup2(pipefd[1], 1);
 		close_pipefd(pipefd);
-		execute_command(cmd, path, fd);
+		execute_command(cmd, path_exe, fd);
 	}
 	free_split(cmd);
 	free(path);

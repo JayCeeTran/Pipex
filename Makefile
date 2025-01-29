@@ -7,6 +7,7 @@ SRCS = pipex.c \
 	free_cmds.c \
 	write_error.c \
 	execute_command.c \
+	env_path.c \
 
 OBJ = $(SRCS:.c=.o)
 LIBFT = -Llibft -lft

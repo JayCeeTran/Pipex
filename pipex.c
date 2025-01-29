@@ -43,22 +43,24 @@ int	check_input_file(char *argv)
 	return(fd);
 }
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv, char **env) 
 {
 	int fd[2];
 	int	pipefd[2];
 	int i;
+	char **path;
 
 	if (argc < 5)
-		return(0);
+		too_few_arguments();
 	fd[0] = check_input_file(argv[1]);
 	fd[1] = check_output_file(argv[argc - 1]);
 	if(fd[1] == -1 || fd[0] == -1)
 		fd_open_fail(fd);
 	check_command_arguments(argv, fd, argc);
+	path = find_path(env);
 	if(pipe(pipefd) == -1)
 		pipe_failed(NULL, fd);
-	first_child(argv[2], pipefd, fd);
+	first_child(argv[2], pipefd, fd, path);
 	i = loop_mid(argv, pipefd, fd, argc);
 	while(i-- >= 2)
 		wait(NULL);

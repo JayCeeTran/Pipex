@@ -14,3 +14,9 @@ void    path_failed_malloc(char **cmd, int *pipefd, int *fd)
     write(2, "Failed to malloc path string\n", 29);
     exit(EXIT_FAILURE);
 }
+
+void	too_few_arguments(void)
+{
+	write(2, "Error\nToo few arguments\n", 24);
+	exit(EXIT_FAILURE);
+}

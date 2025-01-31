@@ -12,63 +12,71 @@
 
 #include "pipex.h"
 
-char    **find_path(char **env)
+void    find_path(char **env, t_fds *data)
 {
     int i;
-    char **path;
     
     i = 0;
     while(env[i])
     {
         if(ft_strncmp("PATH=", env[i], 5) == 0)
         { 
-              path = ft_split(env[i] + 5, ':');
+              data->envp = ft_split(env[i] + 5, ':');
+			  if(!data->envp)
+			  {
+				write(2, "Error\nFailed to malloc envp\n", 28);
+				close_fds(data->fd);
+				exit(EXIT_FAILURE);
+			  }
               break;
         }    
         i++;
     }
     if(!env[i])
     {
-        write(2, "Error\nNo path found\n", 20);
-        exit(EXIT_FAILURE);
+        write(2, "Error\nNo envp found\n", 20);
+		close_fds(data->fd);
+		exit(EXIT_FAILURE);
     }
-    return(path);
 }
 
-/*void    execute_permission(char *path)
+void    execute_permission(char *path, t_fds *data, int child, char **cmd)
 {
-    if (access(path, X_OK) == -1)
+	if (access(path, X_OK) == -1)
     {
-        free(path);
-        write(2, "Permission denied\n", 18);
+		which_fd_to_close(child, data);
+        free_split(cmd);
+		free_split(data->envp);
+		free(path);
+        write(2, "Error\nExecution Permission denied\n", 34);
         exit(126);
     }
-}   
-void    no_exe_file(char *path)
-{
-    free(path);
-    
 }
 
-char *find_correct_bin(char *av, char **path)
+char *find_correct_bin(char **cmd, t_fds *data, int child)
 {
     char *path_exe;
     char *slash;
     int i;
 
     i = 0;
-    while(path[i])
+    while(data->envp[i])
     {
-        slash = ft_strjoin(path[i], "/");
-        path_exe = ft_strjoin(slash, av);
+        slash = ft_strjoin(data->envp[i], "/");
+        path_exe = ft_strjoin(slash, cmd[0]);
+		if(!slash || !path_exe)
+		{
+			free(slash);
+			path_failed_malloc(cmd, data, child);
+		}
         free(slash);
         if(access(path_exe, F_OK) == 0)
         {
-            execute_permission(path_exe);
+            execute_permission(path_exe, data, child, cmd);
             return(path_exe);
         }
- 
-        
+		free(path_exe);
+        i++;
     }
-
-}*/
+	return (NULL);
+}

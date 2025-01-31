@@ -8,12 +8,13 @@ SRCS = pipex.c \
 	write_error.c \
 	execute_command.c \
 	env_path.c \
+	ls_command.c \
 
 OBJ = $(SRCS:.c=.o)
 LIBFT = -Llibft -lft
 FPRINT = -Lft_printf -lftprintf
 RM = rm -f
-EXE = pipex.out
+EXE = pipex
 
 all: $(EXE)
 

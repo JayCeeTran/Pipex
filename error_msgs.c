@@ -24,10 +24,11 @@ void	close_fd_pipe(int *pipefd, int *fd)
 	close_fds(fd);
 }
 
-void	pipe_failed(int *pipe1, int *fd)
+void	pipe_failed(int *pipe1, int *fd, char **envp)
 {
 	close_pipefd(pipe1);
 	close_fds(fd);
+	free_split(envp);
 	perror("Error\nPipe failed\n");
 	exit(EXIT_FAILURE);
 }
@@ -35,5 +36,5 @@ void	pipe_failed(int *pipe1, int *fd)
 void	fd_open_fail(int *fd)
 {
 	close_fds(fd);
-	exit(EXIT_FAILURE);
+	exit(0);
 }

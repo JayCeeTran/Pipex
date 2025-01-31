@@ -28,8 +28,12 @@ void	no_such_file_infile(char *argv)
 	write(2, ": No such file or directory\n", 28);
 }
 
-void	command_not_found(char *argv)
+void	command_not_found(char **cmd, t_fds *data, int child)
 {
-	ft_putstr_err(argv);
+	which_fd_to_close(child, data);
+	ft_putstr_err(cmd[0]);
 	write(2, ": command not found\n", 20);
+	free_split(cmd);
+	free_split(data->envp);
+	exit(127);
 }

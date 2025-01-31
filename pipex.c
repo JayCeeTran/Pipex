@@ -45,24 +45,23 @@ int	check_input_file(char *argv)
 
 int main(int argc, char **argv, char **env) 
 {
-	int fd[2];
-	int	pipefd[2];
+	t_fds data;
 	int i;
-	char **path;
 
 	if (argc < 5)
 		too_few_arguments();
-	fd[0] = check_input_file(argv[1]);
-	fd[1] = check_output_file(argv[argc - 1]);
-	if(fd[1] == -1 || fd[0] == -1)
-		fd_open_fail(fd);
-	check_command_arguments(argv, fd, argc);
-	path = find_path(env);
-	if(pipe(pipefd) == -1)
-		pipe_failed(NULL, fd);
-	first_child(argv[2], pipefd, fd, path);
-	i = loop_mid(argv, pipefd, fd, argc);
+	data.fd[0] = check_input_file(argv[1]);
+	data.fd[1] = check_output_file(argv[argc - 1]);
+	if((data.fd[1] == -1 || data.fd[0] == -1) && !is_there_ls(argv, argc, &data))
+		fd_open_fail(data.fd);
+	check_command_arguments(argv, data.fd, argc);
+	find_path(env, &data);
+	command_ls(argv, argc, &data);
+	if(pipe(data.pipe1) == -1)
+		pipe_failed(NULL, data.fd, data.envp);
+	first_child(argv[2],&data);
+	i = loop_mid(argv, &data, argc);
 	while(i-- >= 2)
 		wait(NULL);
-    return 0;
+    return (0);
 }

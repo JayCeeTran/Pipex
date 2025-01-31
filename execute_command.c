@@ -1,13 +1,13 @@
 #include "pipex.h"
 
-void	execute_command(char **cmd, char *path, int *fd)
+void	execute_command(char **cmd, char *path, t_fds *data, int child)
 {
 	execve(path, cmd, NULL);
-	command_not_found(cmd[0]);
+	write(2, "Second argument of path is invalid\n", 35);
+	which_fd_to_close(child, data);
 	free_split(cmd);
 	free(path);
-	close_fds(fd);
-	exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 }
 
 void	check_command_arguments(char **argv, int *fd, int ac)

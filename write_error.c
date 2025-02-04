@@ -1,15 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   write_error.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jtran <jtran@student.hive.fi>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/04 09:01:45 by jtran             #+#    #+#             */
+/*   Updated: 2025/02/04 09:01:50 by jtran            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 void	ft_putstr_err(char *argv)
 {
-	while(*argv)
+	while (*argv)
 	{
 		write(2, argv, 1);
 		argv++;
 	}
 }
 
-void write_bash(void)
+void	write_bash(void)
 {
 	write(2, "-bash: ", 7);
 }

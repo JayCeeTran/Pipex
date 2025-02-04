@@ -19,7 +19,7 @@ EXE = pipex
 all: $(EXE)
 
 run: all
-	./pipex.out file.txt "cat" "wc -l" outfile
+	./pipex file.txt "grep TEST" "grep 123" outfile
 
 $(EXE): $(NAME)
 	make -C libft

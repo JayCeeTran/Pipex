@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   error_msgs.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jtran <jtran@student.hive.fi>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/04 09:02:40 by jtran             #+#    #+#             */
+/*   Updated: 2025/02/04 10:40:25 by jtran            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 void	close_fds(int *fd)
 {
-	if(fd)
-	{	
+	if (fd)
+	{
 		close(fd[0]);
 		close(fd[1]);
 	}
@@ -11,7 +23,7 @@ void	close_fds(int *fd)
 
 void	close_pipefd(int *pipefd)
 {
-	if(pipefd)
+	if (pipefd)
 	{
 		close(pipefd[0]);
 		close(pipefd[1]);
@@ -33,8 +45,8 @@ void	pipe_failed(int *pipe1, int *fd, char **envp)
 	exit(EXIT_FAILURE);
 }
 
-void	fd_open_fail(int *fd)
+void	fd_open_fail_out(int *fd)
 {
 	close_fds(fd);
-	exit(0);
+	exit(EXIT_FAILURE);
 }

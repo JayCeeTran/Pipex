@@ -1,17 +1,29 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ls_command.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jtran <jtran@student.hive.fi>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/04 09:01:58 by jtran             #+#    #+#             */
+/*   Updated: 2025/02/04 10:11:51 by jtran            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
-void    exec_ls(char **av, t_fds *data, int i);
+void	exec_ls(char **av, t_fds *data, int i);
 
 void	command_ls(char **av, int ac, t_fds *data)
 {
-	int i;
+	int	i;
 
-	i = 2;
-	while(av[i] && i < ac - 1)
+	i = 3;
+	while (av[i] && i < ac - 1)
 	{
-		if(ft_strncmp("ls", av[i], 2) == 0 && ft_strlen(av[i]) == 2)
+		if (ft_strncmp("ls", av[i], 2) == 0 && ft_strlen(av[i]) == 2)
 		{
-			if(access(".", R_OK) == 0)
+			if (access(".", R_OK) == 0)
 				data->fd[0] = open(".", O_RDONLY);
 			exec_ls(av, data, i);
 		}
@@ -21,20 +33,20 @@ void	command_ls(char **av, int ac, t_fds *data)
 
 void	exec_ls(char **av, t_fds *data, int i)
 {
-	int pid;
-	char **cmd;
-	char *path;
+	int		pid;
+	char	**cmd;
+	char	*path;
 
 	cmd = ft_split(av[i], ' ');
-	if(!cmd)
+	if (!cmd)
 		failed_malloc(data, 0);
 	path = find_correct_bin(cmd, data, 0);
-	if(!path)
+	if (!path)
 		command_not_found(cmd, data, 0);
 	pid = fork();
-	if(pid == -1)
+	if (pid == -1)
 		fork_error(cmd, path, data, 0);
-	if(pid == 0)
+	if (pid == 0)
 	{
 		dup2(data->fd[0], 0);
 		dup2(data->fd[1], 1);
@@ -48,18 +60,18 @@ void	exec_ls(char **av, t_fds *data, int i)
 
 int	is_there_ls(char **av, int ac, t_fds *data)
 {
-	int i;
+	int	i;
 
-	i = 2;
-	while(av[i] && i < ac - 1)
+	i = 3;
+	while (av[i] && i < ac - 1)
 	{
-		if(ft_strncmp("ls", av[i], 2) == 0 && ft_strlen(av[i]) == 2)
+		if (ft_strncmp("ls", av[i], 2) == 0 && ft_strlen(av[i]) == 2)
 		{
-			if(access(".", R_OK) == 0)
+			if (access(".", R_OK) == 0)
 				data->fd[0] = open(".", O_RDONLY);
-			return(1);
+			return (1);
 		}
 		i++;
 	}
-	return(0);
+	return (0);
 }

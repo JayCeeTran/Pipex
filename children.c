@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   children.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jtran <jtran@student.hive.fi>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/04 09:02:54 by jtran             #+#    #+#             */
+/*   Updated: 2025/02/04 09:02:57 by jtran            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 void	fork_error(char **cmd, char *path, t_fds *data, int child)
@@ -12,18 +24,18 @@ void	fork_error(char **cmd, char *path, t_fds *data, int child)
 
 void	first_child(char *argv, t_fds *data)
 {
-	int pid;
-	char **cmd;
-	char *path_exe;
+	int		pid;
+	char	**cmd;
+	char	*path_exe;
 
 	cmd = ft_split(argv, ' ');
-	if(!cmd)
+	if (!cmd)
 		failed_malloc(data, 1);
 	path_exe = find_correct_bin(cmd, data, 1);
-	if(!path_exe)
+	if (!path_exe)
 		command_not_found(cmd, data, 1);
 	pid = fork();
-	if(pid == -1)
+	if (pid == -1)
 		fork_error(cmd, path_exe, data, 1);
 	if (pid == 0)
 	{
@@ -38,48 +50,48 @@ void	first_child(char *argv, t_fds *data)
 
 int	loop_mid(char **argv, t_fds *data, int ac)
 {
-	int	i;
-	t_pointers pipes;
+	int			i;
+	t_pointers	pipes;
 
 	i = 3;
 	pipes.newpipe = data->pipe2;
 	pipes.cur_pipe = data->pipe1;
-	while(i < ac - 2)
+	while (i < ac - 2)
 	{
-		if(i > 3)
+		if (i > 3)
 		{
 			pipes.temp = pipes.cur_pipe;
 			pipes.cur_pipe = pipes.newpipe;
 			pipes.newpipe = pipes.temp;
 		}
-		if(pipe(pipes.newpipe) == -1)
-			pipe_failed(pipes.cur_pipe, data->fd, data->envp);	
+		if (pipe(pipes.newpipe) == -1)
+			pipe_failed(pipes.cur_pipe, data->fd, data->envp);
 		mid_child(argv[i], data, &pipes);
 		i++;
 	}
-	if(i > 3)
+	if (i > 3)
 		last_child(argv[ac - 2], data, pipes.newpipe);
 	else
 		last_child_no_mid(argv[ac - 2], data, pipes.cur_pipe);
-    return(i);
+	return (i);
 }
 
 void	mid_child(char *argv, t_fds *data, t_pointers *pipe)
 {
-	int pid;
-	char **cmd;
-	char *path;
+	int		pid;
+	char	**cmd;
+	char	*path;
 
 	cmd = ft_split(argv, ' ');
-	if(!cmd)
+	if (!cmd)
 		failed_malloc(data, 2);
 	path = find_correct_bin(cmd, data, 2);
-	if(!path)
+	if (!path)
 		command_not_found(cmd, data, 2);
 	pid = fork();
-	if(pid == -1)
+	if (pid == -1)
 		fork_error(cmd, path, data, 2);
-	if(pid == 0)
+	if (pid == 0)
 	{
 		dup2(pipe->cur_pipe[0], 0);
 		dup2(pipe->newpipe[1], 1);
@@ -93,18 +105,18 @@ void	mid_child(char *argv, t_fds *data, t_pointers *pipe)
 
 void	last_child(char *argv, t_fds *data, int *pipe)
 {
-	int pid;
-	char **cmd;
-	char *path;
-	
+	int		pid;
+	char	**cmd;
+	char	*path;
+
 	cmd = ft_split(argv, ' ');
-	if(!cmd)
+	if (!cmd)
 		failed_malloc(data, 2);
 	path = find_correct_bin(cmd, data, 2);
-	if(!path)
+	if (!path)
 		command_not_found(cmd, data, 2);
 	pid = fork();
-	if(pid == -1)
+	if (pid == -1)
 		fork_error(cmd, path, data, 2);
 	if (pid == 0)
 	{

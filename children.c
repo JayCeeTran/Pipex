@@ -6,7 +6,7 @@
 /*   By: jtran <jtran@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:02:54 by jtran             #+#    #+#             */
-/*   Updated: 2025/02/04 09:02:57 by jtran            ###   ########.fr       */
+/*   Updated: 2025/02/05 12:12:49 by jtran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ void	fork_error(char **cmd, char *path, t_fds *data, int child)
 
 void	first_child(char *argv, t_fds *data)
 {
-	int		pid;
 	char	**cmd;
 	char	*path_exe;
 
@@ -34,11 +33,16 @@ void	first_child(char *argv, t_fds *data)
 	path_exe = find_correct_bin(cmd, data, 1);
 	if (!path_exe)
 		command_not_found(cmd, data, 1);
-	pid = fork();
-	if (pid == -1)
+	data->pid = fork();
+	if (data->pid == -1)
 		fork_error(cmd, path_exe, data, 1);
-	if (pid == 0)
+	if (data->pid == 0)
 	{
+		if(data->fd[0] == -1)
+		{
+			free_all(cmd, data->envp, path_exe);
+			exit(EXIT_FAILURE);
+		}
 		dup2(data->fd[0], 0);
 		dup2(data->pipe1[1], 1);
 		close_pipefd(data->pipe1);
@@ -46,6 +50,7 @@ void	first_child(char *argv, t_fds *data)
 	}
 	free_split(cmd);
 	free(path_exe);
+	waitpid(data->pid, NULL, 0);
 }
 
 int	loop_mid(char **argv, t_fds *data, int ac)
@@ -78,7 +83,6 @@ int	loop_mid(char **argv, t_fds *data, int ac)
 
 void	mid_child(char *argv, t_fds *data, t_pointers *pipe)
 {
-	int		pid;
 	char	**cmd;
 	char	*path;
 
@@ -88,10 +92,10 @@ void	mid_child(char *argv, t_fds *data, t_pointers *pipe)
 	path = find_correct_bin(cmd, data, 2);
 	if (!path)
 		command_not_found(cmd, data, 2);
-	pid = fork();
-	if (pid == -1)
+	data->pid = fork();
+	if (data->pid == -1)
 		fork_error(cmd, path, data, 2);
-	if (pid == 0)
+	if (data->pid == 0)
 	{
 		dup2(pipe->cur_pipe[0], 0);
 		dup2(pipe->newpipe[1], 1);
@@ -101,11 +105,11 @@ void	mid_child(char *argv, t_fds *data, t_pointers *pipe)
 	close_pipefd(pipe->cur_pipe);
 	free_split(cmd);
 	free(path);
+	waitpid(data->pid, NULL, 0);
 }
 
 void	last_child(char *argv, t_fds *data, int *pipe)
 {
-	int		pid;
 	char	**cmd;
 	char	*path;
 
@@ -115,10 +119,10 @@ void	last_child(char *argv, t_fds *data, int *pipe)
 	path = find_correct_bin(cmd, data, 2);
 	if (!path)
 		command_not_found(cmd, data, 2);
-	pid = fork();
-	if (pid == -1)
+	data->pid = fork();
+	if (data->pid == -1)
 		fork_error(cmd, path, data, 2);
-	if (pid == 0)
+	if (data->pid == 0)
 	{
 		dup2(pipe[0], 0);
 		dup2(data->fd[1], 1);
@@ -128,4 +132,8 @@ void	last_child(char *argv, t_fds *data, int *pipe)
 	close_fd_pipe(data->pipe2, data->fd);
 	close_pipefd(data->pipe1);
 	free_all(cmd, data->envp, path);
+	data->status = 0;
+	waitpid(data->pid, &data->status, 0);
+	if (WIFEXITED(data->status))
+        exit(WIFEXITED(data->status));
 }

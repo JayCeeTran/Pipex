@@ -6,7 +6,7 @@
 /*   By: jtran <jtran@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:01:11 by jtran             #+#    #+#             */
-/*   Updated: 2025/02/04 10:42:05 by jtran            ###   ########.fr       */
+/*   Updated: 2025/02/05 13:47:09 by jtran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ typedef struct s_fds
 	int		pipe1[2];
 	int		pipe2[2];
 	char	**envp;
+	pid_t	pid;
+	int		status;
 }			t_fds;
 
 typedef struct s_pointers
@@ -63,4 +65,5 @@ void		last_child(char *argv, t_fds *data, int *pipe);
 void		last_child_no_mid(char *argv, t_fds *data, int *pipe);
 int			loop_mid(char **argv, t_fds *data, int ac);
 void		find_path(char **env, t_fds *data);
+
 #endif

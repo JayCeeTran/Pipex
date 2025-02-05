@@ -6,7 +6,7 @@
 /*   By: jtran <jtran@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:01:18 by jtran             #+#    #+#             */
-/*   Updated: 2025/02/04 11:25:52 by jtran            ###   ########.fr       */
+/*   Updated: 2025/02/05 13:39:53 by jtran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,18 +62,15 @@ int	main(int argc, char **argv, char **env)
 		too_few_arguments();
 	data.fd[0] = check_input_file(argv[1]);
 	data.fd[1] = check_output_file(argv[argc - 1]);
-	if (data.fd[0] == -1 && !is_there_ls(argv, argc, &data))
+	/*if (data.fd[0] == -1 && !is_there_ls(argv, argc, &data))
 		fd_open_fail(data.fd);
 	if (data.fd[1] == -1)
-		fd_open_fail_out(data.fd);
+		fd_open_fail_out(data.fd);*/
 	check_command_arguments(argv, data.fd, argc);
 	find_path(env, &data);
-	command_ls(argv, argc, &data);
 	if (pipe(data.pipe1) == -1)
 		pipe_failed(NULL, data.fd, data.envp);
 	first_child(argv[2], &data);
 	i = loop_mid(argv, &data, argc);
-	while (i-- >= 2)
-		wait(NULL);
 	return (0);
 }

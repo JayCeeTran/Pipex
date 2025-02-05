@@ -6,7 +6,7 @@
 /*   By: jtran <jtran@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 09:02:40 by jtran             #+#    #+#             */
-/*   Updated: 2025/02/04 10:40:25 by jtran            ###   ########.fr       */
+/*   Updated: 2025/02/05 11:52:19 by jtran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,10 @@ void	close_fds(int *fd)
 {
 	if (fd)
 	{
-		close(fd[0]);
-		close(fd[1]);
+		if(fd[0] > 0)
+			close(fd[0]);
+		if(fd[1] > 0)
+			close(fd[1]);
 	}
 }
 
@@ -25,8 +27,10 @@ void	close_pipefd(int *pipefd)
 {
 	if (pipefd)
 	{
-		close(pipefd[0]);
-		close(pipefd[1]);
+		if(pipefd[0] > 0)
+			close(pipefd[0]);
+		if(pipefd[1] > 0)
+			close(pipefd[1]);
 	}
 }
 

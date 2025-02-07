@@ -7,6 +7,7 @@ SRCS = pipex.c \
 	error_msg.c \
 	execute_command.c \
 	free_cmds.c \
+	path_as_command.c \
 	space_only_commands.c \
 	store_initial_arguments_into_struct.c \
 	validate_files.c \

@@ -19,24 +19,46 @@
 # include <fcntl.h>
 # include <sys/wait.h>
 
-typedef struct s_fds
-{
+typedef struct s_data{
 	int		fd[2];
-	int		pipe1[2];
-	int		pipe2[2];
-	char	**envp;
-	pid_t	pid;
+	int		pipe[2];
+	int		ac;
+	char	**env;			
+	pid_t	pid1;
+	pid_t	pid2;
 	int		status;
-}			t_fds;
+}			t_data;
 
-typedef struct s_pointers
-{
-	int		*cur_pipe;
-	int		*newpipe;
-	int		*temp;
-}			t_pointers;
+void    store_ac_env_to_struct(t_data *data, int ac, char **env);
+int    space_only_commands(char *av);
+char    *find_correct_bin(t_data *data, char **cmd);
+void    execute_command(t_data *data, char **cmd, char *path, int i);
+int		validate_outfile(t_data *data, char *av);
+int		validate_infile(char *av);
+void    child1(t_data *data, char **av);
+void    child2(t_data *data, char **av);
+/**
+***		ERROR MESSAGES!!!
+**/
+void    fork_error(t_data *data);
+void    pipe_failed(char **env);
+void	too_few_arguments(void);
+void    failed_malloc(t_data *data);
+void    command_not_found(t_data *data, char **cmd, char *av);
+void    no_such_file_infile(char *argv);
+void    permission_denied(char *argv);
 
-int			is_there_ls(char **av, int ac, t_fds *data);
+/**
+***		CLOSING AND FREEING!!!
+**/
+void	close_fds(int *fd);
+void	close_fd_pipe(int *pipefd, int *fd);
+void    free_split(char **commands);
+void    free_all(char **cmd, char **envp, char *path);
+void    create_out_exit(t_data *data, char *av, int exitcode);
+void	free_close_exit(t_data *data, char **cmd, char *path);
+void    free_exit(t_data *data);
+/*int			is_there_ls(char **av, int ac, t_fds *data);
 void		free_split(char **argv);
 void		free_all(char **cmd, char **envp, char *path);
 void		invalid_argument(void);
@@ -65,5 +87,6 @@ void		last_child(char *argv, t_fds *data, int *pipe);
 void		last_child_no_mid(char *argv, t_fds *data, int *pipe);
 int			loop_mid(char **argv, t_fds *data, int ac);
 void		find_path(char **env, t_fds *data);
+*/
 
 #endif

@@ -36,13 +36,3 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	dest[i + j] = '\0';
 	return (dest);
 }
-
-/*int main(void)
-{
-    char string[] = "hey";
-    char    string2[] = "World";
-    char *dest;
-
-    dest = ft_strjoin(string, string2);
-    printf("%s\n", dest);
-}*/

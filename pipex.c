@@ -1,76 +1,31 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jtran <jtran@student.hive.fi>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/04 09:01:18 by jtran             #+#    #+#             */
-/*   Updated: 2025/02/05 13:39:53 by jtran            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "pipex.h"
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/wait.h>
 
-int	check_output_file(char *argv)
+int	main(int ac, char **av, char **ev)
 {
-	int	fd;
-
-	if (access(argv, W_OK) == -1)
-	{
-		if (errno == ENOENT)
-		{
-			fd = open(argv, O_CREAT | O_WRONLY | O_EXCL, 0664);
-			return (fd);
-		}
-		else if (errno == EACCES)
-		{
-			permission_denied(argv);
-			return (-1);
-		}
-	}
-	fd = open(argv, O_WRONLY | O_TRUNC);
-	return (fd);
-}
-
-int	check_input_file(char *argv)
-{
-	int	fd;
-
-	if (access(argv, R_OK) == -1)
-	{
-		if (errno == ENOENT)
-			no_such_file_infile(argv);
-		else if (errno == EACCES)
-			permission_denied(argv);
-		return (-1);
-	}
-	else
-		fd = open(argv, O_RDONLY);
-	return (fd);
-}
-
-int	main(int argc, char **argv, char **env)
-{
-	t_fds	data;
-	int		i;
-
-	if (argc < 5)
+	t_data data;
+	
+	if(ac != 5)
 		too_few_arguments();
-	data.fd[0] = check_input_file(argv[1]);
-	data.fd[1] = check_output_file(argv[argc - 1]);
-	/*if (data.fd[0] == -1 && !is_there_ls(argv, argc, &data))
-		fd_open_fail(data.fd);
-	if (data.fd[1] == -1)
-		fd_open_fail_out(data.fd);*/
-	check_command_arguments(argv, data.fd, argc);
-	find_path(env, &data);
-	if (pipe(data.pipe1) == -1)
-		pipe_failed(NULL, data.fd, data.envp);
-	first_child(argv[2], &data);
-	i = loop_mid(argv, &data, argc);
-	return (0);
+	store_ac_env_to_struct(&data, ac, ev);
+	if(pipe(data.pipe) == -1)
+		pipe_failed(data.env);
+	data.pid1 = fork();
+	if(data.pid1 == -1)
+		fork_error(&data);
+	if(data.pid1 == 0)
+		child1(&data, av);
+	close(data.pipe[1]);
+	data.pid2 = fork();
+	if(data.pid2 == -1)
+		fork_error(&data);
+	if(data.pid2 == 0)
+		child2(&data, av);
+	waitpid(data.pid1, &data.status, 0);
+	waitpid(data.pid2, &data.status, 0);
+	free_split(data.env);
+	close(data.pipe[0]);
+	if(WIFEXITED(data.status))
+		exit(WEXITSTATUS(data.status));
+	return(0);
 }
+

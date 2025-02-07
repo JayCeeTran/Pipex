@@ -1,14 +1,16 @@
 NAME = libpipex.a
 CFLAGS = -Wall -Wextra -Werror
 SRCS = pipex.c \
-	error_msgs.c \
-	error_msgs2.c \
 	children.c \
-	free_cmds.c \
-	write_error.c \
-	execute_command.c \
+	close_fds.c \
 	env_path.c \
-	ls_command.c \
+	error_msg.c \
+	execute_command.c \
+	free_cmds.c \
+	space_only_commands.c \
+	store_initial_arguments_into_struct.c \
+	validate_files.c \
+	write_error.c \
 
 OBJ = $(SRCS:.c=.o)
 LIBFT = -Llibft -lft

@@ -12,31 +12,11 @@
 
 #include "pipex.h"
 
-void	execute_command(char **cmd, char *path, t_fds *data, int child)
+void	execute_command(t_data *data, char **cmd, char *path, int i)
 {
+	close_fds(data->pipe);
+	close(data->fd[i]);
 	execve(path, cmd, NULL);
-	which_fd_to_close(child, data);
-	free_split(cmd);
-	free(path);
-	exit(EXIT_FAILURE);
-}
-
-void	check_command_arguments(char **argv, int *fd, int ac)
-{
-	int	i;
-	int	j;
-
-	j = 0;
-	i = 2;
-	while (i < ac - 1)
-	{
-		while (argv[i][j] == ' ')
-			j++;
-		if (argv[i][j] == '\0')
-		{
-			close_fds(fd);
-			exit(EXIT_FAILURE);
-		}
-		i++;
-	}
+	free_all(cmd, data->env, path);
+	exit(0);
 }

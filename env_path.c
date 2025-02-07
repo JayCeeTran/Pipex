@@ -12,70 +12,50 @@
 
 #include "pipex.h"
 
-void	find_path(char **env, t_fds *data)
-{
-	int	i;
-
-	i = 0;
-	while (env[i])
-	{
-		if (ft_strncmp("PATH=", env[i], 5) == 0)
-		{
-			data->envp = ft_split(env[i] + 5, ':');
-			if (!data->envp)
-			{
-				write(2, "Error\nFailed to malloc envp\n", 28);
-				close_fds(data->fd);
-				exit(EXIT_FAILURE);
-			}
-			break ;
-		}
-		i++;
-	}
-	if (!env[i])
-	{
-		write(2, "Error\nNo envp found\n", 20);
-		close_fds(data->fd);
-		exit(EXIT_FAILURE);
-	}
-}
-
-void	execute_permission(char *path, t_fds *data, int child, char **cmd)
+void	execute_permission(t_data *data, char **cmd, char *path)
 {
 	if (access(path, X_OK) == -1)
 	{
-		which_fd_to_close(child, data);
-		free_split(cmd);
-		free_split(data->envp);
-		free(path);
+		free_all(cmd, data->env, path);
+		close_fds(data->pipe);
 		write(2, "Error\nExecution Permission denied\n", 34);
 		exit(126);
 	}
 }
 
-char	*find_correct_bin(char **cmd, t_fds *data, int child)
+void	strjoin_failed(t_data *data, char **cmd, char *slash)
 {
-	char	*path_exe;
+	free_split(cmd);
+	free_split(data->env);
+	if(slash)
+		free(slash);
+	close_fds(data->pipe);
+	write(2, "Error\nFailed to malloc path to command\n", 39);
+	exit(EXIT_FAILURE);
+}
+
+char	*find_correct_bin(t_data *data, char **cmd)
+{
+	char	*path;
 	char	*slash;
 	int		i;
 
 	i = 0;
-	while (data->envp[i])
+	while (data->env[i])
 	{
-		slash = ft_strjoin(data->envp[i], "/");
-		path_exe = ft_strjoin(slash, cmd[0]);
-		if (!slash || !path_exe)
-		{
-			free(slash);
-			path_failed_malloc(cmd, data, child);
-		}
+		slash = ft_strjoin(data->env[i], "/");
+		if(!slash)
+			strjoin_failed(data, cmd, NULL);
+		path = ft_strjoin(slash, cmd[0]);
+		if (!path)
+			strjoin_failed(data, cmd, slash);
 		free(slash);
-		if (access(path_exe, F_OK) == 0)
+		if (access(path, F_OK) == 0)
 		{
-			execute_permission(path_exe, data, child, cmd);
-			return (path_exe);
+			execute_permission(data, cmd, path);
+			return (path);
 		}
-		free(path_exe);
+		free(path);
 		i++;
 	}
 	return (NULL);

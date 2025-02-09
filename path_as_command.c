@@ -12,12 +12,14 @@
 
 #include "pipex.h"
 
-char	*path_as_command(char **cmd)
+char	*path_as_command(t_data *data, char **cmd)
 {
 	if (access(cmd[0], F_OK) == 0)
 	{
 		if (access(cmd[0], X_OK) == 0)
 			return (cmd[0]);
+		else
+			execute_permission(data, cmd, NULL);
 	}
 	return (NULL);
 }

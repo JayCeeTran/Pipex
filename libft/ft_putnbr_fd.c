@@ -38,14 +38,3 @@ void	ft_putnbr_fd(int n, int fd)
 		divider /= 10;
 	}
 }
-
-/*int	main(void)
-{
-	ft_putnbr_fd(1000, 1);
-	printf("\n");
-	ft_putnbr_fd(-1000, 1);
-	printf("\n");
-	ft_putnbr_fd(-2147483648LL, 2);
-	printf("\n");
-	ft_putnbr_fd(-9874410, 2);
-}*/

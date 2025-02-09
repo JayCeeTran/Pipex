@@ -20,7 +20,7 @@ void	fork_error(t_data *data)
 	exit(EXIT_FAILURE);
 }
 
-void	child1(t_data *data, char **av)
+void	child1(t_data *data, char **av, char **ev)
 {
 	char	**cmd;
 	char	*path;
@@ -30,8 +30,8 @@ void	child1(t_data *data, char **av)
 	cmd = ft_split(av[2], ' ');
 	if (!cmd)
 		failed_malloc(data);
-	if (path_as_command(cmd))
-		path = path_as_command(cmd);
+	if (path_as_command(data, cmd))
+		path = path_as_command(data, cmd);
 	else
 		path = find_correct_bin(data, cmd);
 	if (!path)
@@ -41,10 +41,11 @@ void	child1(t_data *data, char **av)
 		free_close_exit(data, cmd, path);
 	dup2(data->fd[0], 0);
 	dup2(data->pipe[1], 1);
-	execute_command(data, cmd, path, 0);
+	close(data->fd[0]);
+	execute_command(data, cmd, path, ev);
 }
 
-void	child2(t_data *data, char **av)
+void	child2(t_data *data, char **av, char **ev)
 {
 	char	**cmd;
 	char	*path;
@@ -54,8 +55,8 @@ void	child2(t_data *data, char **av)
 	cmd = ft_split(av[3], ' ');
 	if (!cmd)
 		failed_malloc(data);
-	if (path_as_command(cmd))
-		path = path_as_command(cmd);
+	if (path_as_command(data, cmd))
+		path = path_as_command(data, cmd);
 	else
 		path = find_correct_bin(data, cmd);
 	if (!path)
@@ -65,5 +66,6 @@ void	child2(t_data *data, char **av)
 		free_close_exit(data, cmd, path);
 	dup2(data->pipe[0], 0);
 	dup2(data->fd[1], 1);
-	execute_command(data, cmd, path, 1);
+	close(data->fd[1]);
+	execute_command(data, cmd, path, ev);
 }

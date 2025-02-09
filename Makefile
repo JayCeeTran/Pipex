@@ -31,8 +31,9 @@ $(EXE): $(NAME)
 
 $(NAME): $(OBJ)
 	ar rcs $(NAME) $(OBJ)
+	make clean
 
-clean: $(OBJ)
+clean:
 	$(RM) $(OBJ)
 
 fclean: clean

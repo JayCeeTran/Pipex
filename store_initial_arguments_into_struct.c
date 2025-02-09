@@ -14,9 +14,8 @@
 
 void	find_path(t_data *data, char **env);
 
-void	store_ac_env_to_struct(t_data *data, int ac, char **env)
+void	store_ac_env_to_struct(t_data *data, char **env)
 {
-	data->ac = ac;
 	find_path(data, env);
 }
 

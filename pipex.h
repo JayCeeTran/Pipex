@@ -23,25 +23,25 @@ typedef struct s_data
 {
 	int		fd[2];
 	int		pipe[2];
-	int		ac;
 	char	**env;
 	pid_t	pid1;
 	pid_t	pid2;
 	int		status;
 }			t_data;
 
-void		store_ac_env_to_struct(t_data *data, int ac, char **env);
+void		store_ac_env_to_struct(t_data *data, char **env);
 int			space_only_commands(char *av);
 char		*find_correct_bin(t_data *data, char **cmd);
-char		*path_as_command(char **cmd);
-void		execute_command(t_data *data, char **cmd, char *path, int i);
+char		*path_as_command(t_data *data, char **cmd);
+void		execute_command(t_data *data, char **cmd, char *path, char **ev);
 int			validate_outfile(char *av);
 int			validate_infile(char *av);
-void		child1(t_data *data, char **av);
-void		child2(t_data *data, char **av);
+void		child1(t_data *data, char **av, char **ev);
+void		child2(t_data *data, char **av, char **ev);
 /**
 ***		ERROR MESSAGES!!!
 **/
+void		execute_permission(t_data *data, char **cmd, char *path);
 void		fork_error(t_data *data);
 void		pipe_failed(char **env);
 void		too_few_arguments(void);

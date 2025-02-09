@@ -18,20 +18,20 @@ int	main(int ac, char **av, char **ev)
 
 	if (ac != 5)
 		too_few_arguments();
-	store_ac_env_to_struct(&data, ac, ev);
+	store_ac_env_to_struct(&data, ev);
 	if (pipe(data.pipe) == -1)
 		pipe_failed(data.env);
 	data.pid1 = fork();
 	if (data.pid1 == -1)
 		fork_error(&data);
 	if (data.pid1 == 0)
-		child1(&data, av);
+		child1(&data, av, ev);
 	close(data.pipe[1]);
 	data.pid2 = fork();
 	if (data.pid2 == -1)
 		fork_error(&data);
 	if (data.pid2 == 0)
-		child2(&data, av);
+		child2(&data, av, ev);
 	waitpid(data.pid1, &data.status, 0);
 	waitpid(data.pid2, &data.status, 0);
 	free_split(data.env);

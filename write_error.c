@@ -23,7 +23,7 @@ void	ft_putstr_err(char *av)
 
 void	write_bash(void)
 {
-	write(2, "-bash: ", 7);
+	write(2, "-pipex: ", 8);
 }
 
 void	permission_denied(char *argv)
@@ -40,10 +40,13 @@ void	no_such_file_infile(char *argv)
 	write(2, ": No such file or directory\n", 28);
 }
 
-void	command_not_found(t_data *data, char **cmd, char *av)
+void	command_not_found(t_data *data, char **cmd)
 {
-	ft_putstr_err(cmd[0]);
+	if(cmd)
+		ft_putstr_err(cmd[0]);
 	write(2, ": command not found\n", 20);
 	free_split(cmd);
-	create_out_exit(data, av, 127);
+	free_split(data->env);
+	close_fd_pipe(data->pipe, data->fd);
+	exit(127);
 }

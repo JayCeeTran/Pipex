@@ -27,17 +27,18 @@ typedef struct s_data
 	pid_t	pid1;
 	pid_t	pid2;
 	int		status;
+	int		wait;
 }			t_data;
 
 void		store_ac_env_to_struct(t_data *data, char **env);
-int			space_only_commands(char *av);
+int		space_only_commands(char *av);
 char		*find_correct_bin(t_data *data, char **cmd);
 char		*path_as_command(t_data *data, char **cmd);
 void		execute_command(t_data *data, char **cmd, char *path, char **ev);
 int			validate_outfile(char *av);
 int			validate_infile(char *av);
-void		child1(t_data *data, char **av, char **ev);
-void		child2(t_data *data, char **av, char **ev);
+void		child1(t_data *data, char **av, char **ev, char **cmd);
+void		child2(t_data *data, char **av, char **ev, char **cmd);
 /**
 ***		ERROR MESSAGES!!!
 **/
@@ -46,9 +47,12 @@ void		fork_error(t_data *data);
 void		pipe_failed(char **env);
 void		too_few_arguments(void);
 void		failed_malloc(t_data *data);
-void		command_not_found(t_data *data, char **cmd, char *av);
+void		command_not_found(t_data *data, char **cmd);
 void		no_such_file_infile(char *argv);
 void		permission_denied(char *argv);
+void		ft_putstr_err(char *av);
+void		write_bash(void);
+void		is_dir(char *av);
 /**
 ***		CLOSING AND FREEING!!!
 **/
@@ -56,7 +60,6 @@ void		close_fds(int *fd);
 void		close_fd_pipe(int *pipefd, int *fd);
 void		free_split(char **commands);
 void		free_all(char **cmd, char **envp, char *path);
-void		create_out_exit(t_data *data, char *av, int exitcode);
 void		free_close_exit(t_data *data, char **cmd, char *path);
 void		free_exit(t_data *data);
 

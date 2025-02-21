@@ -16,9 +16,14 @@ void	execute_permission(t_data *data, char **cmd, char *path)
 {
 	if (access(path, X_OK) == -1)
 	{
+		if(path[0] != '.' && path[0] != '/')
+		{
+			free(path);
+			command_not_found(data, cmd);
+		}
+		permission_denied(path);
 		free_all(cmd, data->env, path);
-		close_fds(data->pipe);
-		write(2, "Error\nExecution Permission denied\n", 34);
+		close_fd_pipe(data->pipe, data->fd);
 		exit(126);
 	}
 }
@@ -29,7 +34,7 @@ void	strjoin_failed(t_data *data, char **cmd, char *slash)
 	free_split(data->env);
 	if (slash)
 		free(slash);
-	close_fds(data->pipe);
+	close_fd_pipe(data->pipe, data->fd);
 	write(2, "Error\nFailed to malloc path to command\n", 39);
 	exit(EXIT_FAILURE);
 }
@@ -45,7 +50,7 @@ char	*find_correct_bin(t_data *data, char **cmd)
 	{
 		slash = ft_strjoin(data->env[i], "/");
 		if (!slash)
-			strjoin_failed(data, cmd, NULL);
+			strjoin_failed(data, cmd, NULL);	
 		path = ft_strjoin(slash, cmd[0]);
 		if (!path)
 			strjoin_failed(data, cmd, slash);

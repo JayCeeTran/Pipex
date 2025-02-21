@@ -31,7 +31,6 @@ $(EXE): $(NAME)
 
 $(NAME): $(OBJ)
 	ar rcs $(NAME) $(OBJ)
-	make clean
 
 clean:
 	$(RM) $(OBJ)
@@ -42,3 +41,5 @@ fclean: clean
 	$(RM) $(NAME) $(EXE)
 
 re: fclean all
+
+.PHONY: all clean fclean re run

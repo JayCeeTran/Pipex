@@ -28,7 +28,7 @@ void	pipe_failed(char **env)
 void	failed_malloc(t_data *data)
 {
 	free_split(data->env);
-	close_fds(data->pipe);
+	close_fd_pipe(data->pipe, data->fd);
 	write(2, "Error\nFailed to malloc command strings\n", 39);
 	exit(EXIT_FAILURE);
 }
@@ -36,6 +36,6 @@ void	failed_malloc(t_data *data)
 void	free_close_exit(t_data *data, char **cmd, char *path)
 {
 	free_all(cmd, data->env, path);
-	close_fds(data->pipe);
+	close_fd_pipe(data->pipe, data->fd);
 	exit(EXIT_FAILURE);
 }

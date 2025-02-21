@@ -16,6 +16,8 @@ void	find_path(t_data *data, char **env);
 
 void	store_ac_env_to_struct(t_data *data, char **env)
 {
+	data->fd[0] = 2147483647;
+	data->fd[1] = 2147483647;
 	find_path(data, env);
 }
 

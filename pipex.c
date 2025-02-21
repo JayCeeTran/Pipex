@@ -12,6 +12,12 @@
 
 #include "pipex.h"
 
+void	free_closepipe(t_data *data)
+{
+	free_split(data->env);
+	close(data->pipe[0]);
+}
+
 int	main(int ac, char **av, char **ev)
 {
 	t_data	data;
@@ -25,17 +31,16 @@ int	main(int ac, char **av, char **ev)
 	if (data.pid1 == -1)
 		fork_error(&data);
 	if (data.pid1 == 0)
-		child1(&data, av, ev);
+		child1(&data, av, ev, NULL);
 	close(data.pipe[1]);
 	data.pid2 = fork();
 	if (data.pid2 == -1)
 		fork_error(&data);
 	if (data.pid2 == 0)
-		child2(&data, av, ev);
+		child2(&data, av, ev, NULL);
 	waitpid(data.pid1, &data.status, 0);
 	waitpid(data.pid2, &data.status, 0);
-	free_split(data.env);
-	close(data.pipe[0]);
+	free_closepipe(&data);
 	if (WIFEXITED(data.status))
 		exit(WEXITSTATUS(data.status));
 	return (0);

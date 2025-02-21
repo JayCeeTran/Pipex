@@ -16,9 +16,9 @@ void	close_fds(int *fd)
 {
 	if (fd)
 	{
-		if (fd[0] > 0)
+		if (fd[0] > 0 && fd[0] < 2147483647)
 			close(fd[0]);
-		if (fd[1] > 0)
+		if (fd[1] > 0 && fd[1] < 2147483647)
 			close(fd[1]);
 	}
 }

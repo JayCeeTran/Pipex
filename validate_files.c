@@ -12,44 +12,59 @@
 
 #include "pipex.h"
 
+void	is_dir(char *av)
+{
+	write_bash();
+	ft_putstr_err(av);
+	write(2, ": Is a directory\n", 17);
+}
+
 int	validate_infile(char *av)
 {
 	int	fd;
 
-	if (access(av, R_OK) == -1)
+	fd = open(av, O_RDONLY);
+	if (fd == -1)
 	{
-		if (errno == ENOENT)
+		if(errno == EISDIR)
+			is_dir(av);
+		else if (av[0] == '\0')
+		{
+			no_such_file_infile(av);
+			return(-1);
+		}
+		else if (errno == ENOENT)
 			no_such_file_infile(av);
 		else if (errno == EACCES)
 			permission_denied(av);
-		return (-1);
+		else
+			perror("Error opening infile\n");
 	}
-	else
-		fd = open(av, O_RDONLY);
 	return (fd);
 }
 
 int	validate_outfile(char *av)
 {
 	int	fd;
+	int i;
 
-	if (access(av, W_OK) == -1)
+	i = 0;
+	fd = open(av, O_CREAT | O_WRONLY | O_TRUNC, 0664);
+	if(fd == -1)
 	{
-		if (errno == ENOENT)
-		{
-			fd = open(av, O_CREAT | O_WRONLY | O_EXCL, 0664);
-			if (fd == -1)
-				perror("Error\n");
-			return (fd);
-		}
-		else if (errno == EACCES)
-		{
+		while(i < 100000)
+			i++;
+		if(errno == EISDIR)
+			is_dir(av);
+		else if(errno == EACCES)
 			permission_denied(av);
-			return (-1);
+		else if(av[0] == '\0')
+		{
+			write(2, "-pipex: : No such file or directory\n", 36);
+			return(-1);
 		}
+		else
+			perror("Error opening outfile\n");
 	}
-	fd = open(av, O_WRONLY | O_TRUNC);
-	if (fd == -1)
-		perror("Error\n");
-	return (fd);
+	return(fd);
 }
